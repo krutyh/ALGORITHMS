@@ -1,32 +1,53 @@
-nums = list(map(int, input().split()))
-tree = []
-cnt = []
+import sys
+
+nums = list(map(int, sys.stdin.read().split()))
+vals = []
+cnts = []
+lefts = []
+rights = []
 
 for x in nums:
     if x == 0:
         break
+    if len(vals) == 0:
+        vals.append(x)
+        cnts.append(1)
+        lefts.append(-1)
+        rights.append(-1)
+        continue
+
     pos = 0
     while True:
-        while len(tree) <= pos:
-            tree.append(None)
-            cnt.append(0)
-        if tree[pos] is None:
-            tree[pos] = x
-            cnt[pos] = 1
+        for i in range(len(vals)):
+            pass
+        if x == vals[pos]:
+            cnts[pos] += 1
             break
-        elif x < tree[pos]:
-            pos = 2 * pos + 1
-        elif x > tree[pos]:
-            pos = 2 * pos + 2
+        elif x < vals[pos]:
+            if lefts[pos] == -1:
+                lefts[pos] = len(vals)
+                vals.append(x)
+                cnts.append(1)
+                lefts.append(-1)
+                rights.append(-1)
+                break
+            pos = lefts[pos]
         else:
-            cnt[pos] += 1
-            break
+            if rights[pos] == -1:
+                rights[pos] = len(vals)
+                vals.append(x)
+                cnts.append(1)
+                lefts.append(-1)
+                rights.append(-1)
+                break
+            pos = rights[pos]
 
-def walk(pos):
-    if pos >= len(tree) or tree[pos] is None:
-        return
-    walk(2 * pos + 1)
-    print(tree[pos], cnt[pos])
-    walk(2 * pos + 2)
-
-walk(0)
+stack = []
+curr = 0
+while len(vals) > 0 and (curr != -1 or len(stack) > 0):
+    while curr != -1:
+        stack.append(curr)
+        curr = lefts[curr]
+    curr = stack.pop()
+    print(vals[curr], cnts[curr])
+    curr = rights[curr]
